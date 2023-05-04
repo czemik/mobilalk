@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Aram</string>
+    <string name="registration">Regisztráció</string>
+    <string name="email">Email cím</string>
+    <string name="name">Teljes név</string>
+    <string name="password">Jelszó</string>
+    <string name="password_confirm">Jelszó megerősítése</string>
+    <string name="cancel">Mégse</string>
+    <string name="login">Bejelentkezés</string>
 </resources>
