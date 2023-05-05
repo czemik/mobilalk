@@ -7,4 +7,7 @@
     <string name="password_confirm">Jelszó megerősítése</string>
     <string name="cancel">Mégse</string>
     <string name="login">Bejelentkezés</string>
+    <string name="logout">Kijelentkezés</string>
+    <string name="report">Áram lejelentés</string>
+    <string name="old_reports">Korábbi lejelentések</string>
 </resources>
