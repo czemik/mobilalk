@@ -42,6 +42,10 @@ public class LoginActivity extends AppCompatActivity {
         return view -> {
             String email = emailET.getText().toString();
             String password = passwordET.getText().toString();
+            if(email.isEmpty() || password.isEmpty()){
+                Log.e(LOG_TAG, "All fields must contain something");
+                return;
+            }
             mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {

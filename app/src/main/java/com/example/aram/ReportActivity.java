@@ -31,7 +31,7 @@ public class ReportActivity extends AppCompatActivity {
 
     private static TextView dateView;
     private EditText amountET;
-    private static Report report = new Report();
+    private static Report report;
     private static ReportActivity ins = null;
     private FirebaseFirestore mFirestore;
     private CollectionReference mItems;
@@ -43,23 +43,29 @@ public class ReportActivity extends AppCompatActivity {
         setContentView(R.layout.activity_report);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         Bundle bundle = getIntent().getExtras();
-        int secret_key = bundle.getInt("SECRET_KEY");
         String reportId = bundle.getString("id");
+        int secret_key = bundle.getInt("SECRET_KEY");
+
+        report = new Report();
         report.setUid(user.getUid());
+
         mFirestore = FirebaseFirestore.getInstance();
         mItems = mFirestore.collection("Reports");
         if(secret_key != SECRET_KEY || user == null){
             finish();
         }
         Log.d(LOG_TAG, "Logged in user:" + user);
+
         findViewById(R.id.datePickerButton).setOnClickListener(showDatePickerDialog());
         findViewById(R.id.submitButton).setOnClickListener(submitReport());
         findViewById(R.id.cancelButton).setOnClickListener(e->finish());
+
         mNotificationHandler = new NotificationHandler(this);
+
         amountET = findViewById(R.id.amountEditText);
         dateView = findViewById(R.id.dateTextView);
         ins = this;
-        if(!reportId.isEmpty()){
+        if(reportId != null){
             getReportById(reportId);
         }
     }
@@ -111,19 +117,20 @@ public class ReportActivity extends AppCompatActivity {
     }
     public void sendToFirebase(){
         Thread thread;
-        if(report.getId().isEmpty()){
+        System.out.println(report.getId());
+        if(report.getId() == null){
             thread = new Thread(() -> mItems.add(report).addOnSuccessListener(documentReference -> {
                 report.setId(documentReference.getId());
                 documentReference.set(report);
                 mNotificationHandler.send(getString(R.string.success_report));
                 finish();
-            }).addOnFailureListener(e -> Log.d(LOG_TAG, "Couldn't add report!")));
+            }).addOnFailureListener(e -> Log.e(LOG_TAG, "Couldn't add report!")));
         }
         else{
             thread = new Thread(() -> mItems.document(report.getId()).set(report).addOnSuccessListener(documentReference -> {
                 mNotificationHandler.send(getString(R.string.success_edit));
                 finish();
-            }).addOnFailureListener(e -> Log.d(LOG_TAG, "Couldn't edit the report!")));
+            }).addOnFailureListener(e -> Log.e(LOG_TAG, "Couldn't edit the report!")));
         }
         thread.start();
 

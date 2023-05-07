@@ -59,6 +59,10 @@ public class RegisterActivity extends AppCompatActivity {
             String email = emailEditText.getText().toString();
             String password = passwordEditText.getText().toString();
             String passwordConfirm = passwordConfirmEditText.getText().toString();
+            if (fullName.isEmpty() || email.isEmpty() || password.isEmpty() || passwordConfirm.isEmpty()){
+                Log.e(LOG_TAG, "All fields must contain something");
+                return;
+            }
             if(!password.equals(passwordConfirm)){
                 Log.e(LOG_TAG, "Passwords don't match");
                 return;

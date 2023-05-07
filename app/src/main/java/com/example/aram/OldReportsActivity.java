@@ -44,7 +44,7 @@ public class OldReportsActivity extends AppCompatActivity {
             finish();
         }
         container = findViewById(R.id.reportContainer);
-
+        findViewById(R.id.cancelButton).setOnClickListener(e->finish());
         mFirestore = FirebaseFirestore.getInstance();
         mItems = mFirestore.collection("Reports");
         reportList = new ArrayList<>();
@@ -60,6 +60,7 @@ public class OldReportsActivity extends AppCompatActivity {
     private void refresh(){
         LayoutInflater inflater = LayoutInflater.from(this);
         container.removeAllViews();
+        Log.d(LOG_TAG, "Refresh started");
         for (int i = 0; i < reportList.size(); i++) {
             View itemView = inflater.inflate(R.layout.report_layout, container, false);
             Report report = reportList.get(i);
@@ -83,6 +84,7 @@ public class OldReportsActivity extends AppCompatActivity {
             });
 
             container.addView(itemView);
+
         }
     }
 
@@ -108,12 +110,12 @@ public class OldReportsActivity extends AppCompatActivity {
         new Thread(() -> {
             ref.delete().addOnSuccessListener(success -> {
                 Log.d(LOG_TAG, "Deleted: " + report.getId());
+                reportList.remove(report);
+                refresh();
             }).addOnFailureListener(failure -> {
                 runOnUiThread(() -> {
                     Toast.makeText(this, "Couldn't delete: " + report.getId(), Toast.LENGTH_SHORT).show();
                 });
-            }).addOnCompleteListener(task -> {
-                refresh();
             });
         }).start();
     }
