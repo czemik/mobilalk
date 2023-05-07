@@ -32,4 +32,5 @@
     <string name="edit">Szerkesztés</string>
     <string name="delete">Törlés</string>
     <string name="success_edit">Áram lejelentés frissítése sikeresen megtörtént!</string>
+    <string name="already">Már le lett adva fogyasztás ehez a dátumhoz!</string>
 </resources>

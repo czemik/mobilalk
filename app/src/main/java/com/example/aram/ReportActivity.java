@@ -9,10 +9,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.ThemedSpinnerAdapter;
+import android.widget.Toast;
 
 import com.example.aram.models.Report;
 import com.google.firebase.auth.FirebaseAuth;
@@ -94,7 +97,7 @@ public class ReportActivity extends AppCompatActivity {
 
             report.setAmount(amount);
             Log.d(LOG_TAG, report.toString());
-            sendToFirebase();
+            checkReport();
         };
     }
 
@@ -111,9 +114,28 @@ public class ReportActivity extends AppCompatActivity {
         }).start();
     }
 
+    public void checkReport(){
+        Thread thread = new Thread(() -> mItems.whereEqualTo("month",report.getMonth()).whereEqualTo("year", report.getYear()).get().addOnSuccessListener(documentReference -> {
+            Log.d(LOG_TAG, documentReference.toString());
+            if(documentReference.isEmpty()){
+                Log.d(LOG_TAG, "Sent to firebase");
+                sendToFirebase();
+            }
+            else{
+                Log.d(LOG_TAG, "Toast initiated");
+                Toast.makeText(ReportActivity.this, getString(R.string.already), Toast.LENGTH_LONG).show();
+            }
+        }).addOnFailureListener(e -> Log.e(LOG_TAG, "Couldn't add report!")));
+        thread.start();
+    }
+
+
     public void setFields(){
         amountET.setText(report.getAmount().toString());
         setDateView();
+        Button dateButton = findViewById(R.id.datePickerButton);
+        dateButton.setEnabled(false);
+        //((ViewGroup) dateButton.getParent()).removeView(dateButton);
     }
     public void sendToFirebase(){
         Thread thread;
