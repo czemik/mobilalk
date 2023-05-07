@@ -10,4 +10,23 @@
     <string name="logout">Kijelentkezés</string>
     <string name="report">Áram lejelentés</string>
     <string name="old_reports">Korábbi lejelentések</string>
+    <string name="ok">Ok</string>
+    <string name="pick_date">Dátum kiválasztása</string>
+    <string name="submit">Küldés</string>
+    <string name="amount">Mennyiség</string>
+    <string name="date_default">Dátum: nincs kiválasztva</string>
+    <string name="date">Dátum: </string>
+    <string name="jan">január</string>
+    <string name="feb">február</string>
+    <string name="mar">március</string>
+    <string name="apr">április</string>
+    <string name="may">május</string>
+    <string name="jun">június</string>
+    <string name="jul">július</string>
+    <string name="aug">augusztus</string>
+    <string name="sep">szeptember</string>
+    <string name="oct">október</string>
+    <string name="nov">november</string>
+    <string name="dec">december</string>
+    <string name="success_report">Áram lejelentése sikeresen megtörtént!</string>
 </resources>

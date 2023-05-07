@@ -1,9 +1,14 @@
 package com.example.aram.models;
 
+
+import android.content.res.Resources;
+
+import com.example.aram.R;
+
 public class Report {
-    private int amount;
-    private int month;
-    private int year;
+    private Integer amount;
+    private Integer month;
+    private Integer year;
     private String id;
     private String uid;
 
@@ -15,15 +20,18 @@ public class Report {
         this.uid = uid;
     }
 
-    public int getAmount() {
+    public Report(){
+
+    }
+    public Integer getAmount() {
         return amount;
     }
 
-    public int getMonth() {
+    public Integer getMonth() {
         return month;
     }
 
-    public int getYear() {
+    public Integer getYear() {
         return year;
     }
 
@@ -54,4 +62,16 @@ public class Report {
     public void setUid(String uid) {
         this.uid = uid;
     }
+
+    @Override
+    public String toString() {
+        return "Report{" +
+                "amount=" + amount +
+                ", month=" + month +
+                ", year=" + year +
+                ", id='" + id + '\'' +
+                ", uid='" + uid + '\'' +
+                '}';
+    }
+
 }
