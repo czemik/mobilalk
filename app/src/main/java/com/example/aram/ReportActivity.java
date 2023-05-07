@@ -153,7 +153,7 @@ public class ReportActivity extends AppCompatActivity {
         @Override
         public void onDateSet(DatePicker view, int year, int month, int day) {
             ReportActivity.report.setYear(year);
-            ReportActivity.report.setMonth(month);
+            ReportActivity.report.setMonth(month + 1);
             ReportActivity.setDateView();
         }
     }

@@ -88,19 +88,17 @@ public class OldReportsActivity extends AppCompatActivity {
 
     private void getReports() {
         reportList.clear();
-        new Thread(()->{
-            mItems
-                    .whereEqualTo("uid", user.getUid())
-                    .get()
-                    .addOnSuccessListener(queryDocumentSnapshots -> {
-                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                            Report item = document.toObject(Report.class);
-                            reportList.add(item);
-                        }
-                        System.out.println(reportList);
-                        refresh();
-                    });
-        }).start();
+        new Thread(()-> mItems
+                .whereEqualTo("uid", user.getUid())
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        Report item = document.toObject(Report.class);
+                        reportList.add(item);
+                    }
+                    System.out.println(reportList);
+                    refresh();
+                })).start();
 
     }
     public void deleteReport(Report report) {
