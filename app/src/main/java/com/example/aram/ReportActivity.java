@@ -38,13 +38,14 @@ public class ReportActivity extends AppCompatActivity {
     private static ReportActivity ins = null;
     private FirebaseFirestore mFirestore;
     private CollectionReference mItems;
+    private FirebaseUser user;
     private NotificationHandler mNotificationHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report);
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        user = FirebaseAuth.getInstance().getCurrentUser();
         Bundle bundle = getIntent().getExtras();
         String reportId = bundle.getString("id");
         int secret_key = bundle.getInt("SECRET_KEY");
@@ -115,18 +116,22 @@ public class ReportActivity extends AppCompatActivity {
     }
 
     public void checkReport(){
-        Thread thread = new Thread(() -> mItems.whereEqualTo("month",report.getMonth()).whereEqualTo("year", report.getYear()).get().addOnSuccessListener(documentReference -> {
-            Log.d(LOG_TAG, documentReference.toString());
-            if(documentReference.isEmpty()){
-                Log.d(LOG_TAG, "Sent to firebase");
-                sendToFirebase();
-            }
-            else{
-                Log.d(LOG_TAG, "Toast initiated");
-                Toast.makeText(ReportActivity.this, getString(R.string.already), Toast.LENGTH_LONG).show();
-            }
-        }).addOnFailureListener(e -> Log.e(LOG_TAG, "Couldn't add report!")));
-        thread.start();
+        if(report.getId() != null){
+            sendToFirebase();
+        }
+        else {
+            Thread thread = new Thread(() -> mItems.whereEqualTo("month", report.getMonth()).whereEqualTo("uid", user.getUid()).whereEqualTo("year", report.getYear()).get().addOnSuccessListener(documentReference -> {
+                Log.d(LOG_TAG, documentReference.toString());
+                if (documentReference.isEmpty()) {
+                    Log.d(LOG_TAG, "Sent to firebase");
+                    sendToFirebase();
+                } else {
+                    Log.d(LOG_TAG, "Toast initiated");
+                    Toast.makeText(ReportActivity.this, getString(R.string.already), Toast.LENGTH_LONG).show();
+                }
+            }).addOnFailureListener(e -> Log.e(LOG_TAG, "Couldn't add report!")));
+            thread.start();
+        }
     }
 
 
