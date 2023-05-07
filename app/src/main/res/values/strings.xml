@@ -29,4 +29,7 @@
     <string name="nov">november</string>
     <string name="dec">december</string>
     <string name="success_report">Áram lejelentése sikeresen megtörtént!</string>
+    <string name="edit">Szerkesztés</string>
+    <string name="delete">Törlés</string>
+    <string name="success_edit">Áram lejelentés frissítése sikeresen megtörtént!</string>
 </resources>

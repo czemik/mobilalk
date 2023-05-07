@@ -12,12 +12,15 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.ThemedSpinnerAdapter;
 
 import com.example.aram.models.Report;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -26,10 +29,9 @@ public class ReportActivity extends AppCompatActivity {
     private static final int SECRET_KEY = 99;
     private final String LOG_TAG = ReportActivity.class.getName();
 
-    private TextView dateView;
-
+    private static TextView dateView;
+    private EditText amountET;
     private static Report report = new Report();
-    private static TextView textView;
     private static ReportActivity ins = null;
     private FirebaseFirestore mFirestore;
     private CollectionReference mItems;
@@ -40,10 +42,12 @@ public class ReportActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if(user == null) finish();
         Bundle bundle = getIntent().getExtras();
         int secret_key = bundle.getInt("SECRET_KEY");
-
+        String reportId = bundle.getString("id");
+        report.setUid(user.getUid());
+        mFirestore = FirebaseFirestore.getInstance();
+        mItems = mFirestore.collection("Reports");
         if(secret_key != SECRET_KEY || user == null){
             finish();
         }
@@ -51,12 +55,13 @@ public class ReportActivity extends AppCompatActivity {
         findViewById(R.id.datePickerButton).setOnClickListener(showDatePickerDialog());
         findViewById(R.id.submitButton).setOnClickListener(submitReport());
         findViewById(R.id.cancelButton).setOnClickListener(e->finish());
-        mFirestore = FirebaseFirestore.getInstance();
-        mItems = mFirestore.collection("Reports");
         mNotificationHandler = new NotificationHandler(this);
-        report.setUid(user.getUid());
-        textView = findViewById(R.id.dateTextView);
+        amountET = findViewById(R.id.amountEditText);
+        dateView = findViewById(R.id.dateTextView);
         ins = this;
+        if(!reportId.isEmpty()){
+            getReportById(reportId);
+        }
     }
 
     public View.OnClickListener showDatePickerDialog() {
@@ -68,11 +73,11 @@ public class ReportActivity extends AppCompatActivity {
 
     public View.OnClickListener submitReport(){
         return view -> {
-            EditText amountET = findViewById(R.id.amountEditText);
+
             if(report.getYear() == null  || report.getMonth() == null || amountET.getText().toString().isEmpty()){
                 return;
             }
-            Integer amount = 0;
+            Integer amount;
             try{
                 amount = Integer.parseInt(amountET.getText().toString());
             }
@@ -87,18 +92,46 @@ public class ReportActivity extends AppCompatActivity {
         };
     }
 
+    public void getReportById(String id){
+        new Thread(()->{
+            mItems
+                    .document(id)
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshot -> {
+                        report = queryDocumentSnapshot.toObject(Report.class);
+                        System.out.println(report);
+                        setFields();
+                    }).addOnFailureListener(e->Log.e(LOG_TAG, e.getMessage()));
+        }).start();
+    }
+
+    public void setFields(){
+        amountET.setText(report.getAmount().toString());
+        setDateView();
+    }
     public void sendToFirebase(){
-        Thread thread = new Thread(() -> mItems.add(report).addOnSuccessListener(documentReference -> {
-            report.setId(documentReference.getId());
-            documentReference.set(report);
-            mNotificationHandler.send(getString(R.string.success_report));
-            finish();
-        }).addOnFailureListener(e -> Log.d(LOG_TAG, "Couldn't add report!")));
+        Thread thread;
+        if(report.getId().isEmpty()){
+            thread = new Thread(() -> mItems.add(report).addOnSuccessListener(documentReference -> {
+                report.setId(documentReference.getId());
+                documentReference.set(report);
+                mNotificationHandler.send(getString(R.string.success_report));
+                finish();
+            }).addOnFailureListener(e -> Log.d(LOG_TAG, "Couldn't add report!")));
+        }
+        else{
+            thread = new Thread(() -> mItems.document(report.getId()).set(report).addOnSuccessListener(documentReference -> {
+                mNotificationHandler.send(getString(R.string.success_edit));
+                finish();
+            }).addOnFailureListener(e -> Log.d(LOG_TAG, "Couldn't edit the report!")));
+        }
         thread.start();
+
+
     }
 
     protected static void setDateView(){
-        textView.setText(DateConverter.convertDate(ins, report));
+        dateView.setText(DateConverter.convertDate(ins, report));
     }
 
     public static class DatePickerFragment extends DialogFragment
